@@ -1,0 +1,20 @@
+require:
+  - rubocop-rails
+  - rubocop-rspec
+
+AllCops:
+  TargetRubyVersion: 3.1
+  TargetRailsVersion: 7.0
+  NewCops: enable
+
+Rails:
+  Enabled: true
+
+Bundler/OrderedGems:
+  Enabled: false
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Style/Documentation:
+  Enabled: false
