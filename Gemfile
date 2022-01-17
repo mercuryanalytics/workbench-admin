@@ -15,7 +15,9 @@ gem "turbo-rails" # [https://turbo.hotwired.dev]
 gem "stimulus-rails" # [https://stimulus.hotwired.dev]
 
 gem "cssbundling-rails"
+gem "slim-rails"
 gem "jbuilder"
+gem "interactor"
 
 # Use Redis adapter to run Action Cable in production
 # gem "redis", "~> 4.0"
@@ -30,9 +32,13 @@ gem "bootsnap", require: false
 # Use Sass to process CSS
 # gem "sassc-rails"
 
+gem "quickbooks-ruby"
+
 group :development, :test do
   gem "debug", platforms: %i[mri mingw x64_mingw]
   gem "rspec-rails", "~> 5.0"
+  gem "factory_bot_rails"
+  gem "timecop"
 end
 
 group :development do

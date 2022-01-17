@@ -36,3 +36,6 @@
 /node_modules
 
 /config/credentials/development.key
+
+/.solargraph.yml
+/spec/examples.txt
