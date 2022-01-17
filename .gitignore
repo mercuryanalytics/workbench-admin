@@ -39,3 +39,5 @@
 
 /.solargraph.yml
 /spec/examples.txt
+
+/config/credentials/production.key
