@@ -17,7 +17,7 @@ gem "stimulus-rails" # [https://stimulus.hotwired.dev]
 gem "cssbundling-rails"
 gem "slim-rails"
 gem "jbuilder"
-gem "interactor"
+gem "interactor-rails"
 
 # Use Redis adapter to run Action Cable in production
 # gem "redis", "~> 4.0"

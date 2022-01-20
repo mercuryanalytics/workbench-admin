@@ -5,4 +5,4 @@ Rails.application.config.intuit_realm = if Rails.env.production?
                                         else
                                           "4620816365181655620"
                                         end
-Quickbooks.sandbox_mode = !Rails.env.production?
+Quickbooks.sandbox_mode = false # !Rails.env.production?

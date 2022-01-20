@@ -11,7 +11,7 @@ class IntuitAccount < OauthToken
     retries = 3
     begin
       yield oauth_access_token
-    rescue OAuth2::Error, Quickbooks::AuthorizationFailure => e
+    rescue OAuth2::Error, Quickbooks::AuthorizationFailure
       retries -= 1
       raise TooManyRetries if retries <= 0
 

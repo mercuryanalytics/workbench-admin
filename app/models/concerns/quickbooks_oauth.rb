@@ -5,13 +5,21 @@ module QuickbooksOauth
 
   def refresh_token!
     refresh_token = oauth_access_token.refresh!
+    update_from(refresh_token)
+  end
+
+  def save_token_from_code(code, redirect_uri)
+    resp = oauth_client.auth_code.get_token(code, redirect_uri:)
+    update_from(resp) if resp
+  end
+
+  def update_from(oauth_token)
+    Rails.logger.debug { "update_from #{oauth_token.inspect}" }
+    access_token = oauth_token.token
+    expires_at = Time.at(oauth_token.expires_at).utc
+    refresh_token = oauth_token.refresh_token
     refresh_expires_at = [refresh_token["x_refresh_token_expires_in"].to_i.seconds, 100.days].max
-    update!(
-      access_token: refresh_token.token,
-      expires_at: Time.at(refresh_token.expires_at).utc,
-      refresh_token: refresh_token.refresh_token,
-      refresh_expires_at: refresh_expires_at.from_now
-    )
+    update!(access_token:, expires_at:, refresh_token:, refresh_expires_at:)
   end
 
   def grant_url(redirect_uri)
@@ -21,11 +29,6 @@ module QuickbooksOauth
       state: SecureRandom.hex(12),
       scope: "com.intuit.quickbooks.accounting"
     )
-  end
-
-  def get_refresh_token(code, redirect_uri)
-    resp = oauth_client.auth_code.get_token(code, redirect_uri:)
-    update_from(resp) if resp
   end
 
   def oauth_access_token
@@ -43,12 +46,24 @@ module QuickbooksOauth
       @oauth_client ||= OAuth2::Client.new(oauth_client_id, oauth_client_secret, oauth_options)
     end
 
+    def intuit_app
+      :live
+    end
+
+    def oauth_credentials
+      Rails.application.credentials.intuit[intuit_app]
+    end
+
+    def realm
+      oauth_credentials.realm_id
+    end
+
     def oauth_client_id
-      Rails.application.credentials.intuit.client_id
+      oauth_credentials.client_id
     end
 
     def oauth_client_secret
-      Rails.application.credentials.intuit.client_secret
+      oauth_credentials.client_secret
     end
 
     def oauth_options
