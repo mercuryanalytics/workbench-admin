@@ -47,6 +47,14 @@ group :development do
   gem "rubocop-rails", require: false
   gem "rubocop-rspec"
 
+  gem "capistrano", "~> 3.10", require: false
+  gem "capistrano-rails", "~> 1.6", require: false
+  gem "capistrano-rbenv", "~> 2.2", require: false
+  gem "capistrano-bundler", "~> 2.0", require: false
+  gem "capistrano-passenger", require: false
+  gem "ed25519", ">= 1.2", "< 2.0"
+  gem "bcrypt_pbkdf", ">= 1.0", "< 2.0"
+
   # Add speed badges [https://github.com/MiniProfiler/rack-mini-profiler]
   # gem "rack-mini-profiler"
 
