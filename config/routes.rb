@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
-  resources :experiments, only: %i[index]
+  resources :invoices, only: %i[show]
   get "api/oauth_callback", to: "application#intuit_callback"
 
   namespace :integration do
@@ -13,7 +13,7 @@ end
 # rubocop:disable Layout/LineLength
 =begin # rubocop:disable Style/BlockComments
                                   Prefix Verb   URI Pattern                                                                                       Controller#Action
-                             experiments GET    /experiments(.:format)                                                                            experiments#index
+                                 invoice GET    /invoices/:id(.:format)                                                                           invoices#show
                       api_oauth_callback GET    /api/oauth_callback(.:format)                                                                     application#intuit_callback
                       integration_qb_tos GET    /integration/qb-tos(.:format)                                                                     integration#qb_tos
                   integration_qb_privacy GET    /integration/qb-privacy(.:format)                                                                 integration#qb_privacy

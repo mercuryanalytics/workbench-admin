@@ -15,17 +15,17 @@ class LocateInvoiceForProject
 
       id = case data.count
            when 0
-             context.fail!(reason: "Not found")
+             context.fail!(reason: :not_found)
            when 1
              data.first.id
            else
-             context.fail!(reason: "Ambiguous")
+             context.fail!(reason: :ambiguous)
            end
 
       invoices = authorized_service(token, Quickbooks::Service::Invoice)
                  .find_by(:customer_ref, id)
 
-      context.fail!(reason: "Not invoiced") if invoices.count.zero?
+      context.fail!(reason: :not_invoiced) if invoices.count.zero?
 
       context.invoice = invoices.first
     end
