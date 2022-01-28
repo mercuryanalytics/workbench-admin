@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-Talaria::Application.configure do
+Rails.application.configure do
   config.lograge.enabled = true
   config.lograge.keep_original_rails_log = true
 
