@@ -33,6 +33,7 @@ gem "bootsnap", require: false
 # gem "sassc-rails"
 
 gem "quickbooks-ruby"
+gem "rexml"
 
 group :development, :test do
   gem "debug", platforms: %i[mri mingw x64_mingw]
