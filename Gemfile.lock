@@ -71,7 +71,7 @@ GEM
     airbrussh (1.5.2)
       sshkit (>= 1.6.1, != 1.7.0)
     ast (2.4.2)
-    base64 (0.2.0)
+    base64 (0.1.1)
     bcrypt_pbkdf (1.1.1)
     bcrypt_pbkdf (1.1.1-x86_64-darwin)
     bindex (0.8.1)
@@ -151,7 +151,6 @@ GEM
     jwt (2.8.2)
       base64
     language_server-protocol (3.17.0.3)
-    logger (1.6.0)
     lograge (0.14.0)
       actionpack (>= 4)
       activesupport (>= 4)
@@ -309,9 +308,7 @@ GEM
       rubocop (~> 1.61)
     ruby-progressbar (1.13.0)
     rubyzip (2.3.2)
-    selenium-webdriver (4.22.0)
-      base64 (~> 0.2)
-      logger (~> 1.4)
+    selenium-webdriver (4.16.0)
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
@@ -381,6 +378,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  base64 (= 0.1.1)
   bcrypt_pbkdf (>= 1.0, < 2.0)
   bootsnap
   capistrano (~> 3.10)

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-lock "~> 3.16.0"
+lock "~> 3.18"
 
 set :application, "workbench-admin"
 set :repo_url, "git@github.com:mercuryanalytics/workbench-admin.git"
