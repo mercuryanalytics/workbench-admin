@@ -35,6 +35,7 @@ gem "bootsnap", require: false
 gem "quickbooks-ruby"
 gem "rexml"
 gem "lograge"
+gem "whenever", require: false
 
 group :development, :test do
   gem "debug", platforms: %i[mri mingw x64_mingw]
