@@ -19,7 +19,7 @@ Last reviewed at the **7.0 → 8.1** upgrade.
 | File | Decision | What's intentional / why |
 |---|---|---|
 | `config/environments/development.rb` | Re-append block | `config.hosts` for `workbench-admin.test` and ngrok; `config.assets.quiet` (Rails 8 dropped it for Propshaft, we're on sprockets-rails). |
-| `config/environments/production.rb` | Re-append block | `config.assets.compile = false` (Rails 8 dropped the stock line; sprockets-rails defaults to `true`, i.e. runtime compilation). `public_file_server.enabled` from `RAILS_SERVE_STATIC_FILES`. `config.logger = nil` keeps Rails' default file logger (stock 7.1+ logs to STDOUT; Passenger + Capistrano's linked `log/` expect a file). |
+| `config/environments/production.rb` | Re-append block | `config.assume_ssl = true` (ALB terminates TLS and redirects HTTP; see thoth). `public_file_server.enabled` from `RAILS_SERVE_STATIC_FILES`. `config.logger = nil` keeps Rails' default file logger (stock 7.1+ logs to STDOUT; Passenger + Capistrano's linked `log/` expect a file). |
 | `config/environments/test.rb` | Keep stock | No customizations. |
 | `bin/dev` | Restore ours | jsbundling's foreman launcher for `Procfile.dev`; stock is a Rails-only launcher. |
 | `config/ci.rb`, `bin/ci` | Delete | Stock 8.1 CI runner assumes importmap and minitest; we use rspec. |

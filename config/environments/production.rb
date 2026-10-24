@@ -93,11 +93,11 @@ Rails.application.configure do
   # Mercury customizations follow. Overrides stock Rails above; see doc/rails-upgrades.md
   # ----------------------------------------------------------------------------
 
-  # Rails 8 dropped this stock line for Propshaft, but sprockets-rails defaults it to true,
-  # which would compile assets at runtime in production.
-  config.assets.compile = false
-
   config.public_file_server.enabled = ENV["RAILS_SERVE_STATIC_FILES"].present?
+
+  # TLS terminates at the load balancer, which redirects HTTP to HTTPS and sets X-Forwarded-Proto;
+  # nginx/Passenger only see plain HTTP. Same arrangement as thoth: assume SSL, don't redirect in the app.
+  config.assume_ssl = true
 
   # Passenger serves the app and Capistrano links log/, so keep Rails' default file logger
   # (stock 7.1+ logs to STDOUT).
