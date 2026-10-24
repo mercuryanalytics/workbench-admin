@@ -2,6 +2,7 @@
 
 Rails.application.routes.draw do
   resources :invoices, only: %i[show]
+  get "up", to: "rails/health#show", as: :rails_health_check
   get "api/oauth_callback", to: "application#intuit_callback"
 
   namespace :integration do
