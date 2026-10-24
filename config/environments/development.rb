@@ -79,8 +79,6 @@ Rails.application.configure do
   # Mercury customizations follow. Overrides stock Rails above; see doc/rails-upgrades.md
   # ----------------------------------------------------------------------------
 
-  config.assets.quiet = true # sprockets-rails; Rails 8 dropped this stock line for Propshaft
-
   config.hosts << "workbench-admin.test"
   config.hosts << "scottb.ngrok.io"
 end
