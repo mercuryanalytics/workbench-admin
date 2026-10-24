@@ -3,9 +3,9 @@
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby "3.1.0"
+ruby "3.3.4"
 
-gem "rails", "~> 7.0.1"
+gem "rails", "~> 7.0.8"
 gem "sprockets-rails"
 gem "pg", "~> 1.1"
 gem "puma", "~> 5.0"
@@ -32,7 +32,7 @@ gem "bootsnap", require: false
 # Use Sass to process CSS
 # gem "sassc-rails"
 
-gem "quickbooks-ruby"
+gem "quickbooks-ruby", "~> 1.0" # 2.x moves to oauth2 2.x; revisit separately
 gem "rexml"
 gem "lograge"
 gem "whenever", require: false
@@ -70,6 +70,3 @@ group :test do
   gem "selenium-webdriver"
   gem "webdrivers"
 end
-
-# hacks for rails compatibility
-gem "base64", "0.1.1"
