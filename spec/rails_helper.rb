@@ -5,6 +5,7 @@ ENV["RAILS_ENV"] ||= "test"
 require File.expand_path("../config/environment", __dir__)
 abort("The Rails environment is running in production mode!") if Rails.env.production?
 require "rspec/rails"
+require "webmock/rspec"
 # Add additional requires below this line. Rails is not loaded until this point!
 
 begin
@@ -21,4 +22,10 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
 
   config.include FactoryBot::Syntax::Methods
+
+  # QuickBooks is live in every environment (see config/initializers/quickbooks.rb), so specs must never reach it.
+  WebMock.disable_net_connect!(allow_localhost: true)
+
+  # IntuitAccount.instance memoizes at class level, which would leak a rolled-back record between examples.
+  config.before { IntuitAccount.instance_variable_set(:@instance, nil) }
 end

@@ -42,6 +42,7 @@ group :development, :test do
   gem "rspec-rails", "~> 5.0"
   gem "factory_bot_rails"
   gem "timecop"
+  gem "webmock"
 end
 
 group :development do
