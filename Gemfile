@@ -5,10 +5,10 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby "3.3.4"
 
-gem "rails", "~> 7.0.8"
+gem "rails", "~> 7.1.0"
 gem "sprockets-rails"
 gem "pg", "~> 1.1"
-gem "puma", "~> 5.0"
+gem "puma", "~> 6.0"
 gem "jsbundling-rails"
 
 gem "turbo-rails" # [https://turbo.hotwired.dev]
@@ -39,7 +39,7 @@ gem "whenever", require: false
 
 group :development, :test do
   gem "debug", platforms: %i[mri mingw x64_mingw]
-  gem "rspec-rails", "~> 5.0"
+  gem "rspec-rails", "~> 7.1"
   gem "factory_bot_rails"
   gem "timecop"
   gem "webmock"
