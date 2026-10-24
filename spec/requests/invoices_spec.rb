@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe "Invoices", type: :request do
   describe "GET /invoices/:id" do
     context "without a stored access token" do
-      it "redirects to Intuit's grant URL" do
+      it "redirects to Intuit's grant URL", :aggregate_failures do
         get invoice_path("Project 1")
 
         expect(response).to have_http_status(:found)
@@ -14,13 +14,15 @@ RSpec.describe "Invoices", type: :request do
     end
 
     context "with a stored access token" do
+      let(:invoice) do
+        instance_double(Quickbooks::Model::Invoice,
+                        customer_ref: instance_double(Quickbooks::Model::BaseReference, name: "Acme"))
+      end
+
       before { create(:intuit_account) }
 
-      it "renders the customer name" do
-        invoice = instance_double(Quickbooks::Model::Invoice, customer_ref: instance_double(Quickbooks::Model::BaseReference, name: "Acme"))
-        allow(LocateInvoiceForProject).to receive(:call).with(project_name: "Project 1")
-                                                        .and_return(Interactor::Context.build(invoice:))
-
+      it "renders the customer name", :aggregate_failures do
+        allow(LocateInvoiceForProject).to receive(:call).and_return(Interactor::Context.build(invoice:))
         get invoice_path("Project 1")
 
         expect(response).to have_http_status(:ok)
@@ -53,11 +55,15 @@ RSpec.describe "Invoices", type: :request do
     expect(response).to redirect_to("https://researchresultswebsite.com")
   end
 
-  it "serves the QuickBooks integration pages" do
+  it "serves the QuickBooks terms of service" do
     get integration_qb_tos_path
-    expect(response).to have_http_status(:ok)
 
+    expect(response).to have_http_status(:ok)
+  end
+
+  it "serves the QuickBooks privacy policy" do
     get integration_qb_privacy_path
+
     expect(response).to have_http_status(:ok)
   end
 

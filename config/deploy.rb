@@ -7,7 +7,7 @@ set :repo_url, "git@github.com:mercuryanalytics/workbench-admin.git"
 
 set :branch, "main"
 
-set :rbenv_ruby, "3.1.0"
+set :rbenv_ruby, "3.3.4"
 
 # Default value for :linked_files is []
 append :linked_files, "config/master.key"
