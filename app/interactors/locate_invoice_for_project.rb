@@ -25,7 +25,8 @@ class LocateInvoiceForProject
       invoices = authorized_service(token, Quickbooks::Service::Invoice)
                  .find_by(:customer_ref, id)
 
-      context.fail!(reason: :not_invoiced) if invoices.count.zero?
+      # Quickbooks::Collection has no empty?; its count is an attribute.
+      context.fail!(reason: :not_invoiced) if invoices.count.zero? # rubocop:disable Style/CollectionQuerying
 
       context.invoice = invoices.first
     end
