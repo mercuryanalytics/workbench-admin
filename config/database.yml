@@ -84,3 +84,8 @@ production:
   database: workbench_admin_production
   username: workbench_admin
   password: <%= ENV["WORKBENCH_ADMIN_DATABASE_PASSWORD"] %>
+
+# Postgres on the box, over the local socket as the deployer user.
+staging:
+  <<: *default
+  database: workbench_admin_staging
