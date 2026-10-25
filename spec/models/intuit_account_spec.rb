@@ -19,6 +19,23 @@ RSpec.describe IntuitAccount, type: :model do
     expect(described_class.instance).to eq subject
   end
 
+  describe "#with_token" do
+    let(:grant_error) do
+      faraday = Faraday::Response.new(status: 400, body: { error: "invalid_grant" }.to_json,
+                                      response_headers: { "Content-Type" => "application/json" })
+      OAuth2::Error.new(OAuth2::Response.new(faraday))
+    end
+
+    it "asks for reauthorization when Intuit rejects the refresh token" do
+      stored = instance_double(OAuth2::AccessToken)
+      allow(OAuth2::AccessToken).to receive(:new).and_return(stored)
+      allow(stored).to receive(:refresh!).and_raise(grant_error)
+
+      expect { subject.with_token { raise Quickbooks::AuthorizationFailure } }
+        .to raise_error(QuickbooksOauth::ReauthorizationRequired)
+    end
+  end
+
   describe "token storage" do
     let(:stored) do
       described_class.connection.select_one(

@@ -3,9 +3,16 @@
 module QuickbooksOauth
   extend ActiveSupport::Concern
 
+  # Intuit no longer honours the stored grant (revoked by the user, or expired), so the user must authorize again.
+  class ReauthorizationRequired < RuntimeError; end
+
   def refresh_token!
     refresh_token = oauth_access_token.refresh!
     update_from(refresh_token)
+  rescue OAuth2::Error => e
+    raise ReauthorizationRequired, e.code if e.code == "invalid_grant"
+
+    raise
   end
 
   def save_token_from_code(code, redirect_uri)
@@ -21,11 +28,11 @@ module QuickbooksOauth
     update!(access_token:, expires_at:, refresh_token:, refresh_expires_at:)
   end
 
-  def grant_url(redirect_uri)
+  def grant_url(redirect_uri, state:)
     oauth_client.auth_code.authorize_url(
       redirect_uri:,
       response_type: "code",
-      state: SecureRandom.hex(12),
+      state:,
       scope: "com.intuit.quickbooks.accounting"
     )
   end

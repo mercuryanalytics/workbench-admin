@@ -4,26 +4,37 @@ class ApplicationController < ActionController::Base
   # Responses carry QuickBooks customer data, and Intuit requires no-store on pages with sensitive data.
   before_action { response.cache_control.merge!(no_store: true) }
 
+  rescue_from QuickbooksOauth::ReauthorizationRequired, with: :authorize_with_intuit
+
   def intuit_authenticate
-    session[:target] = params[:id]
-    redirect_to account.grant_url(api_oauth_callback_url), allow_other_host: true
+    authorize_with_intuit
   end
 
   def acquire_token
-    token = IntuitAccount.instance
-    return if token.access_token
+    return if IntuitAccount.instance.access_token
 
-    redirect_to token.grant_url(api_oauth_callback_url), allow_other_host: true
+    authorize_with_intuit
   end
 
   def intuit_callback
-    # can use params[:state] to retrieve user information
+    # The state we issued with the grant URL must come back, or anyone could link their own company by sending a code.
+    expected = session.delete(:oauth_state)
+    return head :forbidden unless expected && ActiveSupport::SecurityUtils.secure_compare(expected, params[:state].to_s)
 
     account.save_token_from_code(params[:code], api_oauth_callback_url)
-    redirect_to invoice_path(session[:target])
+    target = session.delete(:target)
+    target ? redirect_to(invoice_path(target)) : render(plain: "Connected to QuickBooks")
   end
 
   def account
     IntuitAccount.instance
+  end
+
+  private
+
+  def authorize_with_intuit
+    session[:target] = params[:id]
+    session[:oauth_state] = SecureRandom.hex(12)
+    redirect_to account.grant_url(api_oauth_callback_url, state: session[:oauth_state]), allow_other_host: true
   end
 end
