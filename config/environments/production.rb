@@ -99,6 +99,9 @@ Rails.application.configure do
   # nginx/Passenger only see plain HTTP. Same arrangement as thoth: assume SSL, don't redirect in the app.
   config.assume_ssl = true
 
+  # force_ssl would also set this flag, but the ALB already redirects to HTTPS, so set the flag directly.
+  config.session_store :cookie_store, key: "_workbench_admin_session", secure: true
+
   # Passenger serves the app and Capistrano links log/, so keep Rails' default file logger
   # (stock 7.1+ logs to STDOUT).
   config.logger = nil

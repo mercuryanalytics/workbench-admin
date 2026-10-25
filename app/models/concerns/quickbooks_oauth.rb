@@ -14,7 +14,6 @@ module QuickbooksOauth
   end
 
   def update_from(oauth_token)
-    Rails.logger.debug { "update_from #{oauth_token.inspect}" }
     access_token = oauth_token.token
     expires_at = Time.at(oauth_token.expires_at).utc
     refresh_token = oauth_token.refresh_token

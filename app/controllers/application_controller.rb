@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::Base
+  # Responses carry QuickBooks customer data, and Intuit requires no-store on pages with sensitive data.
+  before_action { response.cache_control.merge!(no_store: true) }
+
   def intuit_authenticate
     session[:target] = params[:id]
     redirect_to account.grant_url(api_oauth_callback_url), allow_other_host: true
@@ -8,7 +11,6 @@ class ApplicationController < ActionController::Base
 
   def acquire_token
     token = IntuitAccount.instance
-    Rails.logger.debug { "Access token: #{token.access_token.inspect}" }
     return if token.access_token
 
     redirect_to token.grant_url(api_oauth_callback_url), allow_other_host: true
