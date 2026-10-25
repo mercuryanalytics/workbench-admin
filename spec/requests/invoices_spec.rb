@@ -47,6 +47,16 @@ RSpec.describe "Invoices", type: :request do
         expect(response.body).to include("authorization is needed")
       end
 
+      it "responds 502 without echoing the QuickBooks message when QuickBooks rejects the query", :aggregate_failures do
+        allow(LocateInvoiceForProject).to receive(:call)
+          .and_raise(Quickbooks::IntuitRequestException, "QueryParserError: Acme Corp")
+
+        get invoice_path("Project 1")
+
+        expect(response).to have_http_status(:bad_gateway)
+        expect(response.body).not_to include("Acme")
+      end
+
       it "responds 409 when the project name is ambiguous" do
         allow(LocateInvoiceForProject).to receive(:call).and_return(failed_context(:ambiguous))
 

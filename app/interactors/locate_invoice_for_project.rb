@@ -46,7 +46,9 @@ class LocateInvoiceForProject
   end
 
   def customer_query
-    clause = query_builder.clause("DisplayName", "LIKE", "#{project_name} %")
+    # The builder escapes quotes but not backslashes, so a backslash before a quote would cancel the escape.
+    name = project_name.gsub("\\") { "\\\\" }
+    clause = query_builder.clause("DisplayName", "LIKE", "#{name} %")
     "SELECT Id, DisplayName FROM Customer WHERE #{clause} MAXRESULTS 2"
   end
 
