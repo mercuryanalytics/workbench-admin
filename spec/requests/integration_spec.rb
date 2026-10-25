@@ -16,7 +16,6 @@ RSpec.describe "Integration pages", type: :request do
       allow(IntuitAccount.instance).to receive(:save_token_from_code)
       get integration_connect_path
       state = Rack::Utils.parse_query(URI(response.location).query)["state"]
-
       get api_oauth_callback_path, params: { code: "abc", state:, realmId: IntuitAccount.realm }
 
       expect(response).to have_http_status(:ok)
