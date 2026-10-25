@@ -33,6 +33,11 @@ class ApplicationController < ActionController::Base
   private
 
   def authorize_with_intuit
+    # A server-to-server caller can't follow Intuit's consent page, so tell it what is wrong instead.
+    unless request.headers["Accept"].to_s.include?("text/html")
+      return render plain: "QuickBooks authorization is needed. Contact IT.", status: :service_unavailable
+    end
+
     session[:target] = params[:id]
     session[:oauth_state] = SecureRandom.hex(12)
     redirect_to account.grant_url(api_oauth_callback_url, state: session[:oauth_state]), allow_other_host: true

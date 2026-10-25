@@ -38,6 +38,15 @@ RSpec.describe "Invoices", type: :request do
         expect(response.location).to start_with("https://appcenter.intuit.com/connect/oauth2")
       end
 
+      it "answers a caller that is not a browser with 503 when the grant has been revoked", :aggregate_failures do
+        allow(LocateInvoiceForProject).to receive(:call).and_raise(QuickbooksOauth::ReauthorizationRequired)
+
+        get invoice_path("Project 1"), headers: { "Accept" => "text/plain" }
+
+        expect(response).to have_http_status(:service_unavailable)
+        expect(response.body).to include("authorization is needed")
+      end
+
       it "responds 409 when the project name is ambiguous" do
         allow(LocateInvoiceForProject).to receive(:call).and_return(failed_context(:ambiguous))
 
