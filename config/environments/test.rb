@@ -52,4 +52,9 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions.
   config.action_controller.raise_on_missing_callback_actions = true
+
+  # Fixed keys so the encrypted token columns work without the credentials file.
+  config.active_record.encryption.primary_key = "test-primary-key"
+  config.active_record.encryption.deterministic_key = "test-deterministic-key"
+  config.active_record.encryption.key_derivation_salt = "test-key-derivation-salt"
 end
