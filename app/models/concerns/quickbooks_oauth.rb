@@ -51,13 +51,13 @@ module QuickbooksOauth
       OAuth2::Client.new(oauth_client_id, oauth_client_secret, oauth_options)
     end
 
-    # Credentials pick the Intuit app per environment; staging uses :sandbox until its live keys are unlocked.
+    # Production credentials hold the live app; every other environment's hold the sandbox app and set intuit_app.
     def intuit_app
       Rails.application.credentials.intuit_app&.to_sym || :live
     end
 
     def oauth_credentials
-      Rails.application.credentials.intuit[intuit_app]
+      Rails.application.credentials.intuit
     end
 
     def realm
