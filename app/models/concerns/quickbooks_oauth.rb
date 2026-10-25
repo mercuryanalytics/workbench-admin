@@ -6,6 +6,10 @@ module QuickbooksOauth
   # Intuit no longer honours the stored grant (revoked by the user, or expired), so the user must authorize again.
   class ReauthorizationRequired < RuntimeError; end
 
+  included do
+    delegate :oauth_client, to: :class
+  end
+
   def refresh_token!
     refresh_token = oauth_access_token.refresh!
     update_from(refresh_token)
@@ -41,15 +45,10 @@ module QuickbooksOauth
     OAuth2::AccessToken.new(oauth_client, access_token, refresh_token:)
   end
 
-  def oauth_client
-    @oauth_client ||= self.class.oauth_client
-  end
-
-  INTUIT_AUTH_URL = "https://appcenter.intuit.com/connect/oauth2"
-  INTUIT_TOKEN_URL = "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer"
   module ClassMethods
+    # Built per call, not memoized, so the endpoints follow the (cached) discovery document.
     def oauth_client
-      @oauth_client ||= OAuth2::Client.new(oauth_client_id, oauth_client_secret, oauth_options)
+      OAuth2::Client.new(oauth_client_id, oauth_client_secret, oauth_options)
     end
 
     # Credentials pick the Intuit app per environment; staging uses :sandbox until its live keys are unlocked.
@@ -74,10 +73,11 @@ module QuickbooksOauth
     end
 
     def oauth_options
+      endpoints = IntuitDiscovery.endpoints(intuit_app)
       {
-        site: INTUIT_AUTH_URL,
-        authorize_url: INTUIT_AUTH_URL,
-        token_url: INTUIT_TOKEN_URL
+        site: endpoints["authorization_endpoint"],
+        authorize_url: endpoints["authorization_endpoint"],
+        token_url: endpoints["token_endpoint"]
       }
     end
   end

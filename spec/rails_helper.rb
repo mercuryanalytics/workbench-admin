@@ -22,9 +22,18 @@ RSpec.configure do |config|
   config.filter_rails_from_backtrace!
 
   config.include FactoryBot::Syntax::Methods
+  config.include ActiveSupport::Testing::TimeHelpers
 
   # QuickBooks is live in every environment (see config/initializers/quickbooks.rb), so specs must never reach it.
   WebMock.disable_net_connect!(allow_localhost: true)
+
+  # Intuit's discovery documents are fetched at runtime; serve them from a stub and start each example uncached.
+  config.before do
+    IntuitDiscovery.reset!
+    IntuitDiscovery::DOCUMENTS.each_value do |url|
+      stub_request(:get, url).to_return(body: IntuitDiscovery::FALLBACK.to_json)
+    end
+  end
 
   # IntuitAccount.instance memoizes at class level, which would leak a rolled-back record between examples.
   config.before { IntuitAccount.instance_variable_set(:@instance, nil) }
