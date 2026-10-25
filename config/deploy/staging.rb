@@ -11,5 +11,6 @@ hosts = ENV["DEPLOY_HOSTS"].to_s.split(",")
 hosts = ["workbench-admin-staging.us-east-1"] if hosts.empty?
 hosts.each { |host| server host, user: "deployer", roles: %w[app web db] }
 
-# Postgres runs on the box and nothing else creates the database.
+# Postgres runs on the box (the AMI only has the client); nothing else creates the role or database.
+set :required_packages, %w[postgresql]
 before "deploy:migrate", "deploy:create_database"
