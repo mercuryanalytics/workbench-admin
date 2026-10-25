@@ -8,6 +8,8 @@ Rails.application.routes.draw do
   namespace :integration do
     get "qb-tos"
     get "qb-privacy"
+    get "connect"
+    get "disconnected"
   end
   root to: redirect("https://researchresultswebsite.com")
 end
