@@ -17,13 +17,15 @@ class ApplicationController < ActionController::Base
   end
 
   def intuit_callback
-    # The state we issued with the grant URL must come back, or anyone could link their own company by sending a code.
-    expected = session.delete(:oauth_state)
-    return head :forbidden unless expected && ActiveSupport::SecurityUtils.secure_compare(expected, params[:state].to_s)
+    return callback_failure("The authorization could not be verified. Start again.", :forbidden) unless state_matches?
+    return callback_failure("QuickBooks access was not granted.", :unprocessable_content) if params[:error].present?
 
     account.save_token_from_code(params[:code], api_oauth_callback_url)
     target = session.delete(:target)
     target ? redirect_to(invoice_path(target)) : render(plain: "Connected to QuickBooks")
+  rescue OAuth2::Error
+    # An authorization code is single use and short lived, so a bad one means the user has to start over.
+    callback_failure("QuickBooks rejected the authorization. Start again.", :bad_request)
   end
 
   def account
@@ -31,6 +33,16 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  # The state we issued with the grant URL must come back, or anyone could link their own company by sending a code.
+  def state_matches?
+    expected = session.delete(:oauth_state)
+    expected.present? && ActiveSupport::SecurityUtils.secure_compare(expected, params[:state].to_s)
+  end
+
+  def callback_failure(message, status)
+    render plain: message, status:
+  end
 
   def authorize_with_intuit
     # A server-to-server caller can't follow Intuit's consent page, so tell it what is wrong instead.

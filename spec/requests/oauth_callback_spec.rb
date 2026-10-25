@@ -3,6 +3,11 @@
 require "rails_helper"
 
 RSpec.describe "GET /api/oauth_callback", type: :request do
+  let(:invalid_grant) do
+    faraday = Faraday::Response.new(status: 400, body: { error: "invalid_grant" }.to_json,
+                                    response_headers: { "Content-Type" => "application/json" })
+    OAuth2::Error.new(OAuth2::Response.new(faraday))
+  end
   let(:state) { Rack::Utils.parse_query(URI(response.location).query)["state"] }
 
   before do
@@ -27,6 +32,22 @@ RSpec.describe "GET /api/oauth_callback", type: :request do
 
     expect(response).to have_http_status(:forbidden)
     expect(IntuitAccount.instance).not_to have_received(:save_token_from_code)
+  end
+
+  it "reports when the user does not grant access", :aggregate_failures do
+    get api_oauth_callback_path, params: { error: "access_denied", state: begin_authorization }
+
+    expect(response).to have_http_status(:unprocessable_content)
+    expect(IntuitAccount.instance).not_to have_received(:save_token_from_code)
+  end
+
+  it "asks the user to start again when Intuit rejects the code", :aggregate_failures do
+    allow(IntuitAccount.instance).to receive(:save_token_from_code).and_raise(invalid_grant)
+
+    get api_oauth_callback_path, params: { code: "stale", state: begin_authorization }
+
+    expect(response).to have_http_status(:bad_request)
+    expect(response.body).to include("Start again")
   end
 
   it "refuses a callback that was never started", :aggregate_failures do
