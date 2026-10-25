@@ -1,0 +1,7 @@
+---
+ignore:
+  # oauth2 1.4.11: a protocol-relative redirect Location can leak the bearer token to another host.
+  # The fix needs oauth2 2.x, which needs quickbooks-ruby 2.x (see the Gemfile). This app only calls
+  # Intuit's fixed endpoints, so a redirect to an attacker host is not reachable. Remove this
+  # entry when quickbooks-ruby is upgraded.
+  - GHSA-pp92-crg2-gfv9

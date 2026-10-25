@@ -8,7 +8,7 @@ ruby "3.3.4"
 gem "rails", "~> 8.1.0"
 gem "propshaft"
 gem "pg", "~> 1.1"
-gem "puma", "~> 6.0"
+gem "puma", ">= 7.2.1"
 gem "jsbundling-rails"
 
 gem "turbo-rails" # [https://turbo.hotwired.dev]
@@ -70,5 +70,8 @@ end
 group :test do
   gem "capybara"
   gem "selenium-webdriver"
-  gem "webdrivers"
+
+  # Security scans (CI runs both weekly); kept out of the development group because the deploy runner installs it.
+  gem "brakeman", require: false
+  gem "bundler-audit", require: false
 end

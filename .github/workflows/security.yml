@@ -1,0 +1,24 @@
+name: Security
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 12 * * 1" # Mondays: new advisories land without any code change
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+      - name: Static analysis
+        run: bundle exec brakeman --no-pager --exit-on-warn --exit-on-error
+      - name: Gem advisories
+        run: bundle exec bundle-audit check --update
