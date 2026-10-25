@@ -19,6 +19,7 @@ class ApplicationController < ActionController::Base
   def intuit_callback
     return callback_failure("The authorization could not be verified. Start again.", :forbidden) unless state_matches?
     return callback_failure("QuickBooks access was not granted.", :unprocessable_content) if params[:error].present?
+    return callback_failure("That is not the company this application is set up for.", :forbidden) unless realm_matches?
 
     account.save_token_from_code(params[:code], api_oauth_callback_url)
     target = session.delete(:target)
@@ -38,6 +39,11 @@ class ApplicationController < ActionController::Base
   def state_matches?
     expected = session.delete(:oauth_state)
     expected.present? && ActiveSupport::SecurityUtils.secure_compare(expected, params[:state].to_s)
+  end
+
+  # The credentials name the one company this app reads; a grant for any other company must not replace its token.
+  def realm_matches?
+    ActiveSupport::SecurityUtils.secure_compare(IntuitAccount.realm.to_s, params[:realmId].to_s)
   end
 
   def callback_failure(message, status)
