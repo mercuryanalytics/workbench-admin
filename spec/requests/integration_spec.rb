@@ -4,6 +4,8 @@ require "rails_helper"
 
 RSpec.describe "Integration pages", type: :request do
   describe "GET /integration/connect" do
+    before { allow(IntuitAccount.instance).to receive(:save_token_from_code) }
+
     it "sends a browser to Intuit with a state to verify", :aggregate_failures do
       get integration_connect_path
 
@@ -13,7 +15,6 @@ RSpec.describe "Integration pages", type: :request do
     end
 
     it "lets the callback finish the connection", :aggregate_failures do
-      allow(IntuitAccount.instance).to receive(:save_token_from_code)
       get integration_connect_path
       state = Rack::Utils.parse_query(URI(response.location).query)["state"]
       get api_oauth_callback_path, params: { code: "abc", state:, realmId: IntuitAccount.realm }
