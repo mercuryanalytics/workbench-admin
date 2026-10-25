@@ -28,7 +28,8 @@ module QuickbooksOauth
     access_token = oauth_token.token
     expires_at = Time.at(oauth_token.expires_at).utc
     refresh_token = oauth_token.refresh_token
-    refresh_expires_at = [refresh_token["x_refresh_token_expires_in"].to_i.seconds, 100.days].max
+    refresh_lifetime = [oauth_token.params["x_refresh_token_expires_in"].to_i.seconds, 100.days].max
+    refresh_expires_at = Time.current + refresh_lifetime
     update!(access_token:, expires_at:, refresh_token:, refresh_expires_at:)
   end
 

@@ -36,6 +36,35 @@ RSpec.describe IntuitAccount, type: :model do
     end
   end
 
+  describe "#update_from" do
+    let(:token) do
+      OAuth2::AccessToken.from_hash(
+        described_class.oauth_client,
+        "access_token" => "access", "refresh_token" => "refresh", "expires_at" => 1.hour.from_now.to_i,
+        "x_refresh_token_expires_in" => 8_726_400
+      )
+    end
+
+    it "stores when the tokens expire", :aggregate_failures do
+      freeze_time do
+        subject.update_from(token)
+
+        expect(subject.reload.expires_at).to eq 1.hour.from_now
+        expect(subject.refresh_expires_at).to eq 8_726_400.seconds.from_now
+      end
+    end
+
+    it "assumes 100 days when Intuit does not say how long the refresh token lasts" do
+      token.params.delete("x_refresh_token_expires_in")
+
+      freeze_time do
+        subject.update_from(token)
+
+        expect(subject.reload.refresh_expires_at).to eq 100.days.from_now
+      end
+    end
+  end
+
   describe "token storage" do
     let(:stored) do
       described_class.connection.select_one(
