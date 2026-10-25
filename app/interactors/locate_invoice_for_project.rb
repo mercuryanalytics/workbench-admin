@@ -10,8 +10,7 @@ class LocateInvoiceForProject
 
   def call
     account.with_token do |token|
-      data = authorized_service(token, Quickbooks::Service::Customer)
-             .query(customer_query)
+      data = with_service(token, Quickbooks::Service::Customer) { |service| service.query(customer_query) }
 
       id = case data.count
            when 0
@@ -22,8 +21,7 @@ class LocateInvoiceForProject
              context.fail!(reason: :ambiguous)
            end
 
-      invoices = authorized_service(token, Quickbooks::Service::Invoice)
-                 .find_by(:customer_ref, id)
+      invoices = with_service(token, Quickbooks::Service::Invoice) { |service| service.find_by(:customer_ref, id) }
 
       # Quickbooks::Collection has no empty?; its count is an attribute.
       context.fail!(reason: :not_invoiced) if invoices.count.zero? # rubocop:disable Style/CollectionQuerying
@@ -33,6 +31,14 @@ class LocateInvoiceForProject
   end
 
   private
+
+  # Logs Intuit's request id, which support needs to trace a call. It is an opaque id, not QuickBooks data.
+  def with_service(token, klass)
+    service = authorized_service(token, klass)
+    yield service
+  ensure
+    Rails.logger.info("QuickBooks #{klass.name.demodulize} intuit_tid=#{service&.last_response_intuit_tid}")
+  end
 
   def authorized_service(token, klass)
     klass.new.tap do |result|
