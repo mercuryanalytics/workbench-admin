@@ -21,9 +21,24 @@ default: &default
   # https://guides.rubyonrails.org/configuring.html#database-pooling
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
-development:
+# Petasos and thoth are read-only sources: we never migrate, create or dump them. Test is the exception,
+# where db/{petasos,thoth}_schema.rb (only the columns we read) are loaded into scratch databases.
+source: &source
   <<: *default
-  database: workbench_admin_development
+  database_tasks: false
+
+development:
+  primary:
+    <<: *default
+    database: workbench_admin_development
+  petasos:
+    <<: *source
+    database: petasos_development
+    migrations_paths: db/petasos_migrate
+  thoth:
+    <<: *source
+    database: thoth_development
+    migrations_paths: db/thoth_migrate
 
   # The specified database role being used to connect to postgres.
   # To create additional roles in postgres see `$ createuser --help`.
@@ -56,8 +71,17 @@ development:
 # re-generated from your development database when you run "rake".
 # Do not set this db to the same as development or production.
 test:
-  <<: *default
-  database: workbench_admin_test
+  primary:
+    <<: *default
+    database: workbench_admin_test
+  petasos:
+    <<: *default
+    database: workbench_admin_petasos_test
+    migrations_paths: db/petasos_migrate
+  thoth:
+    <<: *default
+    database: workbench_admin_thoth_test
+    migrations_paths: db/thoth_migrate
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -81,10 +105,28 @@ test:
 #
 # Postgres on the box, over the local socket as the deployer user.
 production:
-  <<: *default
-  database: workbench_admin_production
+  primary:
+    <<: *default
+    database: workbench_admin_production
+  petasos:
+    <<: *source
+    url: <%= Rails.application.credentials.dig(:databases, :petasos) %>
+    migrations_paths: db/petasos_migrate
+  thoth:
+    <<: *source
+    url: <%= Rails.application.credentials.dig(:databases, :thoth) %>
+    migrations_paths: db/thoth_migrate
 
 # Postgres on the box, over the local socket as the deployer user.
 staging:
-  <<: *default
-  database: workbench_admin_staging
+  primary:
+    <<: *default
+    database: workbench_admin_staging
+  petasos:
+    <<: *source
+    url: <%= Rails.application.credentials.dig(:databases, :petasos) %>
+    migrations_paths: db/petasos_migrate
+  thoth:
+    <<: *source
+    url: <%= Rails.application.credentials.dig(:databases, :thoth) %>
+    migrations_paths: db/thoth_migrate
