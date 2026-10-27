@@ -18,7 +18,7 @@ RSpec.describe ReportMailer do
       allow(Rails.application.credentials).to receive(:dig).and_call_original
       credentials = Rails.application.credentials
       allow(credentials).to receive(:dig).with(:report, :recipients).and_return(["scottb@example.com"])
-      allow(credentials).to receive(:dig).with(:report, :sender).and_return("reports@example.com")
+      allow(credentials).to receive(:dig).with(:smtp, :from).and_return("reports@example.com")
     end
 
     it "is addressed from the credentials" do

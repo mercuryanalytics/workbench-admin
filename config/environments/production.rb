@@ -60,14 +60,15 @@ Rails.application.configure do
   # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "example.com" }
 
-  # SES SMTP; the credentials come from `bin/rails credentials:edit`.
+  # The same SES `smtp` credentials block petasos uses.
+  smtp = Rails.application.credentials.smtp
   config.action_mailer.smtp_settings = {
-    address: Rails.application.credentials.dig(:smtp, :address),
-    user_name: Rails.application.credentials.dig(:smtp, :user_name),
-    password: Rails.application.credentials.dig(:smtp, :password),
-    port: 587,
-    authentication: :plain,
-    enable_starttls_auto: true
+    address: smtp[:host],
+    port: smtp[:port],
+    user_name: smtp[:username],
+    password: smtp[:password],
+    authentication: :login,
+    enable_starttls_auto: smtp[:tls]
   }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
