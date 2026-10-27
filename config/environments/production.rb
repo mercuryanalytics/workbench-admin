@@ -60,15 +60,15 @@ Rails.application.configure do
   # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "example.com" }
 
-  # The same SES `smtp` credentials block petasos uses.
-  smtp = Rails.application.credentials.smtp
+  # The same SES `smtp` credentials block petasos uses. STARTTLS is required rather than read from the credentials, so
+  # a missing `tls` key can't send the password in the clear. `dig` keeps the web app booting before they exist.
   config.action_mailer.smtp_settings = {
-    address: smtp[:host],
-    port: smtp[:port],
-    user_name: smtp[:username],
-    password: smtp[:password],
+    address: Rails.application.credentials.dig(:smtp, :host),
+    port: Rails.application.credentials.dig(:smtp, :port),
+    user_name: Rails.application.credentials.dig(:smtp, :username),
+    password: Rails.application.credentials.dig(:smtp, :password),
     authentication: :login,
-    enable_starttls_auto: smtp[:tls]
+    enable_starttls: true
   }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
