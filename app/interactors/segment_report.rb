@@ -10,11 +10,19 @@ class SegmentReport
   Row = Data.define(:client_id, :account, :users, :logins, :mercury_ai_reports, :ask_reports, :last_project, :segment,
                     :previous_segment, :segment_change)
 
+  FORMULA_START = /\A[=+\-@\t\r]/
+
   def self.csv(rows)
     CSV.generate do |csv|
       csv << Row.members
-      rows.each { |row| csv << row.to_h.values }
+      rows.each { |row| csv << row.to_h.values.map { |value| spreadsheet_safe(value) } }
     end
+  end
+
+  # Account names and project numbers are free text, and a spreadsheet runs a cell starting with one of these as a
+  # formula. The leading quote makes it plain text.
+  def self.spreadsheet_safe(value)
+    value.is_a?(String) && value.match?(FORMULA_START) ? "'#{value}" : value
   end
 
   # parameters

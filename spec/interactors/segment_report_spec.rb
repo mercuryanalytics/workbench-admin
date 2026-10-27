@@ -93,6 +93,13 @@ RSpec.describe SegmentReport do
     end
   end
 
+  describe ".csv with a name a spreadsheet would run as a formula" do
+    it "writes it as text" do
+      create(:petasos_client, name: "=HYPERLINK(\"http://example.com\")")
+      expect(described_class.csv(described_class.call(period:).rows)).to include(",\"'=HYPERLINK(")
+    end
+  end
+
   it "counts a user in every client they belong to" do
     user = create(:petasos_user, last_login: 1.day.ago)
     create_list(:petasos_membership, 2, user:)
