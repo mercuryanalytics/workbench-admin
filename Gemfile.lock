@@ -133,6 +133,7 @@ GEM
     crass (1.0.8)
     cssbundling-rails (1.4.3)
       railties (>= 6.0.0)
+    csv (3.3.6)
     date (3.6.0)
     debug (1.11.1)
       irb (~> 1.10)
@@ -460,6 +461,7 @@ DEPENDENCIES
   capistrano-rbenv (~> 2.2)
   capybara
   cssbundling-rails
+  csv (~> 3.3)
   debug
   ed25519 (>= 1.2, < 2.0)
   factory_bot_rails

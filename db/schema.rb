@@ -10,9 +10,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_25_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_27_200000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "account_weeks", force: :cascade do |t|
+    t.integer "client_id", null: false
+    t.date "week", null: false
+    t.string "account", null: false
+    t.string "segment", null: false
+    t.integer "users", null: false
+    t.integer "logins", null: false
+    t.integer "mercury_ai_reports", null: false
+    t.integer "ask_reports", null: false
+    t.string "last_project"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["client_id", "week"], name: "index_account_weeks_on_client_id_and_week", unique: true
+    t.index ["week"], name: "index_account_weeks_on_week"
+  end
 
   create_table "oauth_tokens", force: :cascade do |t|
     t.string "type", null: false
