@@ -2,5 +2,6 @@
 # config/credentials/<env>.yml.enc and are read through ApplicationSecrets.
 
 shared:
+  report_weeks_retained: 14
   report_recipients:
     - scottb@mercuryanalytics.com

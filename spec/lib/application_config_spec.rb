@@ -19,6 +19,11 @@ RSpec.describe ApplicationConfig do
     expect(described_class.report_recipients).to eq(["scottb@example.com"])
   end
 
+  it "#report_weeks_retained reads data.report_weeks_retained" do
+    data.report_weeks_retained = 14
+    expect(described_class.report_weeks_retained).to eq(14)
+  end
+
   it "does not expose the underlying data object publicly" do
     expect { described_class.data }.to raise_error(NoMethodError)
   end

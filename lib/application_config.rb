@@ -8,6 +8,9 @@ module ApplicationConfig
   # Who the weekly segment report is mailed to.
   def report_recipients = data.report_recipients
 
+  # How many weeks of account_weeks to keep, a quarter plus the week it's compared with.
+  def report_weeks_retained = data.report_weeks_retained
+
   def data = @data ||= Rails.application.config_for(:application_config)
   private_class_method :data
 end

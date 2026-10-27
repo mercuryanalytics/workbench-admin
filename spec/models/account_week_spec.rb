@@ -23,4 +23,15 @@ RSpec.describe AccountWeek do
       expect(described_class.where(client_id: 7, week:).pluck(:segment)).to eq %w[activated]
     end
   end
+
+  describe ".prune" do
+    let(:week) { Date.new(2026, 10, 19) }
+
+    it "deletes weeks older than the retention window and keeps the rest" do
+      create(:account_week, week: week - 15.weeks)
+      kept = [create(:account_week, week: week - 14.weeks), create(:account_week, week: week + 1.week)]
+      described_class.prune(week:, keep: 14)
+      expect(described_class.all).to match_array(kept)
+    end
+  end
 end
