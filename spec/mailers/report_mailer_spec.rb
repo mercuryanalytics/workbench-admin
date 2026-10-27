@@ -15,13 +15,11 @@ RSpec.describe ReportMailer do
     end
 
     before do
-      allow(Rails.application.credentials).to receive(:dig).and_call_original
-      credentials = Rails.application.credentials
-      allow(credentials).to receive(:dig).with(:report, :recipients).and_return(["scottb@example.com"])
-      allow(credentials).to receive(:dig).with(:smtp, :from).and_return("reports@example.com")
+      allow(ApplicationConfig).to receive(:report_recipients).and_return(["scottb@example.com"])
+      allow(ApplicationSecrets).to receive(:smtp_from).and_return("reports@example.com")
     end
 
-    it "is addressed from the credentials" do
+    it "is addressed from the config and secrets" do
       expect(mail).to have_attributes(to: ["scottb@example.com"], from: ["reports@example.com"],
                                       subject: "Platform engagement, week of 2026-10-19")
     end

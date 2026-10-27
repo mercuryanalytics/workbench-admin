@@ -7,6 +7,6 @@ class ReportMailer < ApplicationMailer
     @moves = rows.map(&:segment_change).compact.tally.values_at(:up, :down)
 
     attachments["segments-#{@week}.csv"] = SegmentReport.csv(rows)
-    mail to: Rails.application.credentials.dig(:report, :recipients), subject: "Platform engagement, week of #{@week}"
+    mail to: ApplicationConfig.report_recipients, subject: "Platform engagement, week of #{@week}"
   end
 end

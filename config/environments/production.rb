@@ -61,12 +61,12 @@ Rails.application.configure do
   config.action_mailer.default_url_options = { host: "example.com" }
 
   # The same SES `smtp` credentials block petasos uses. STARTTLS is required rather than read from the credentials, so
-  # a missing `tls` key can't send the password in the clear. `dig` keeps the web app booting before they exist.
+  # a missing `tls` key can't send the password in the clear.
   config.action_mailer.smtp_settings = {
-    address: Rails.application.credentials.dig(:smtp, :host),
-    port: Rails.application.credentials.dig(:smtp, :port),
-    user_name: Rails.application.credentials.dig(:smtp, :username),
-    password: Rails.application.credentials.dig(:smtp, :password),
+    address: ApplicationSecrets.smtp_host,
+    port: ApplicationSecrets.smtp_port,
+    user_name: ApplicationSecrets.smtp_username,
+    password: ApplicationSecrets.smtp_password,
     authentication: :login,
     enable_starttls: true
   }

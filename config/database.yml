@@ -110,11 +110,11 @@ production:
     database: workbench_admin_production
   petasos:
     <<: *source
-    url: <%= Rails.application.credentials.dig(:databases, :petasos) %>
+    url: <%= ApplicationSecrets.petasos_database_url %>
     migrations_paths: db/petasos_migrate
   thoth:
     <<: *source
-    url: <%= Rails.application.credentials.dig(:databases, :thoth) %>
+    url: <%= ApplicationSecrets.thoth_database_url %>
     migrations_paths: db/thoth_migrate
 
 # Postgres on the box, over the local socket as the deployer user.
@@ -124,9 +124,9 @@ staging:
     database: workbench_admin_staging
   petasos:
     <<: *source
-    url: <%= Rails.application.credentials.dig(:databases, :petasos) %>
+    url: <%= ApplicationSecrets.petasos_database_url %>
     migrations_paths: db/petasos_migrate
   thoth:
     <<: *source
-    url: <%= Rails.application.credentials.dig(:databases, :thoth) %>
+    url: <%= ApplicationSecrets.thoth_database_url %>
     migrations_paths: db/thoth_migrate
