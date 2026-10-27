@@ -36,8 +36,11 @@
 /node_modules
 
 /config/credentials/development.key
+/config/credentials/test.key
 
 /.solargraph.yml
 /spec/examples.txt
 
 /config/credentials/production.key
+
+/config/credentials/staging.key

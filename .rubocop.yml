@@ -3,8 +3,8 @@ require:
   - rubocop-rspec
 
 AllCops:
-  TargetRubyVersion: 3.1
-  TargetRailsVersion: 7.0
+  TargetRubyVersion: 3.3
+  TargetRailsVersion: 8.1
   NewCops: enable
 
 Rails:
@@ -30,3 +30,16 @@ Metrics/BlockLength:
 
 RSpec/NamedSubject:
   Enabled: false
+
+# Rails-generated config stays as generated so upgrades diff cleanly (see doc/rails-upgrades.md).
+Layout/SpaceInsideArrayLiteralBrackets:
+  Exclude:
+    - config/environments/*.rb
+
+Style/GlobalStdStream:
+  Exclude:
+    - config/environments/*.rb
+
+Style/SymbolArray:
+  Exclude:
+    - config/initializers/filter_parameter_logging.rb

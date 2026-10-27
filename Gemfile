@@ -3,12 +3,12 @@
 source "https://rubygems.org"
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby "3.1.0"
+ruby "3.3.4"
 
-gem "rails", "~> 7.0.1"
-gem "sprockets-rails"
+gem "rails", "~> 8.1.0"
+gem "propshaft"
 gem "pg", "~> 1.1"
-gem "puma", "~> 5.0"
+gem "puma", ">= 7.2.1"
 gem "jsbundling-rails"
 
 gem "turbo-rails" # [https://turbo.hotwired.dev]
@@ -32,16 +32,18 @@ gem "bootsnap", require: false
 # Use Sass to process CSS
 # gem "sassc-rails"
 
-gem "quickbooks-ruby"
+gem "quickbooks-ruby", "~> 1.0" # 2.x moves to oauth2 2.x; revisit separately
 gem "rexml"
 gem "lograge"
-gem "whenever", require: false
+# Also in development: the deploy runner installs only that group and loads whenever/capistrano from the Capfile.
+gem "whenever", require: false, groups: %i[default development]
 
 group :development, :test do
   gem "debug", platforms: %i[mri mingw x64_mingw]
-  gem "rspec-rails", "~> 5.0"
+  gem "rspec-rails", "~> 8.0"
   gem "factory_bot_rails"
   gem "timecop"
+  gem "webmock"
 end
 
 group :development do
@@ -54,7 +56,7 @@ group :development do
   gem "capistrano-rails", "~> 1.6", require: false
   gem "capistrano-rbenv", "~> 2.2", require: false
   gem "capistrano-bundler", "~> 2.0", require: false
-  gem "capistrano-passenger", require: false
+  gem "capistrano-hgpacker", github: "mercuryanalytics/capistrano-hgpacker", tag: "v0.9.1", require: false
   gem "ed25519", ">= 1.2", "< 2.0"
   gem "bcrypt_pbkdf", ">= 1.0", "< 2.0"
 
@@ -68,8 +70,8 @@ end
 group :test do
   gem "capybara"
   gem "selenium-webdriver"
-  gem "webdrivers"
-end
 
-# hacks for rails compatibility
-gem "base64", "0.1.1"
+  # Security scans (CI runs both weekly); kept out of the development group because the deploy runner installs it.
+  gem "brakeman", require: false
+  gem "bundler-audit", require: false
+end
