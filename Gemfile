@@ -75,3 +75,5 @@ group :test do
   gem "brakeman", require: false
   gem "bundler-audit", require: false
 end
+
+gem "csv", "~> 3.3"
