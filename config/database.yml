@@ -79,11 +79,10 @@ test:
 # Read https://guides.rubyonrails.org/configuring.html#configuring-a-database
 # for a full overview on how database connection configuration can be specified.
 #
+# Postgres on the box, over the local socket as the deployer user.
 production:
   <<: *default
   database: workbench_admin_production
-  username: workbench_admin
-  password: <%= ENV["WORKBENCH_ADMIN_DATABASE_PASSWORD"] %>
 
 # Postgres on the box, over the local socket as the deployer user.
 staging:
