@@ -17,10 +17,22 @@ RSpec.describe AccountWeek do
       expect(described_class.find_by!(client_id: 7, week:)).to have_attributes(segment: "activated", users: 3)
     end
 
-    it "replaces the row when the week is recorded again" do
-      create(:account_week, client_id: 7, week:, segment: "dormant")
-      described_class.record(rows, week:)
-      expect(described_class.where(client_id: 7, week:).pluck(:segment)).to eq %w[activated]
+    context "when the week is already recorded" do
+      before { create(:account_week, client_id: 7, week:, segment: "dormant") }
+
+      it "refuses to replace it" do
+        expect { described_class.record(rows, week:) }.to raise_error(described_class::AlreadyRecorded)
+      end
+
+      it "keeps the stored row" do
+        described_class.record(rows, week:) rescue nil # rubocop:disable Style/RescueModifier
+        expect(described_class.find_by!(client_id: 7, week:).segment).to eq "dormant"
+      end
+
+      it "replaces it when forced" do
+        described_class.record(rows, week:, force: true)
+        expect(described_class.where(client_id: 7, week:).pluck(:segment)).to eq %w[activated]
+      end
     end
   end
 
