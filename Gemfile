@@ -32,7 +32,7 @@ gem "bootsnap", require: false
 # Use Sass to process CSS
 # gem "sassc-rails"
 
-gem "quickbooks-ruby", "~> 1.0" # 2.x moves to oauth2 2.x; revisit separately
+gem "quickbooks-ruby", "~> 2.0" # 2.x moves to oauth2 2.x; revisit separately
 gem "rexml"
 gem "lograge"
 gem "rollbar"
