@@ -338,6 +338,7 @@ GEM
     request_store (1.7.0)
       rack (>= 1.4)
     rexml (3.4.4)
+    rollbar (3.8.0)
     roxml (4.2.0)
       activesupport (>= 4.0)
       nokogiri (>= 1.3.3)
@@ -473,6 +474,7 @@ DEPENDENCIES
   quickbooks-ruby (~> 1.0)
   rails (~> 8.1.0)
   rexml
+  rollbar
   rspec-rails (~> 8.0)
   rubocop
   rubocop-rails

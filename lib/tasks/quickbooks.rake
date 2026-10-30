@@ -8,7 +8,11 @@ namespace :quickbooks do
 
     account.refresh_token!
     puts "QuickBooks token refreshed"
-  rescue QuickbooksOauth::ReauthorizationRequired
+  rescue QuickbooksOauth::ReauthorizationRequired => e
+    Rollbar.error(e, "QuickBooks authorization has lapsed; it must be reconnected")
     abort "QuickBooks authorization has lapsed; it must be reconnected"
+  rescue StandardError => e
+    Rollbar.error(e, "QuickBooks keep-alive refresh failed")
+    raise
   end
 end

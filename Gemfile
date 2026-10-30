@@ -35,6 +35,7 @@ gem "bootsnap", require: false
 gem "quickbooks-ruby", "~> 1.0" # 2.x moves to oauth2 2.x; revisit separately
 gem "rexml"
 gem "lograge"
+gem "rollbar"
 # Also in development: the deploy runner installs only that group and loads whenever/capistrano from the Capfile.
 gem "whenever", require: false, groups: %i[default development]
 
