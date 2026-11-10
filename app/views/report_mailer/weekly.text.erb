@@ -1,0 +1,9 @@
+Platform engagement for the week of <%= @week %>.
+
+<% @counts.each do |segment, count| -%>
+<%= segment.to_s.capitalize %>: <%= count %>
+<% end -%>
+
+Moved up: <%= @moves.first.to_i %>, moved down: <%= @moves.last.to_i %>
+
+The full report is attached.
