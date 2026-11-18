@@ -12,7 +12,7 @@ set :branch, "main"
 set :rollbar_token, ENV.fetch("ROLLBAR_TOKEN", nil)
 set :rollbar_env, -> { fetch(:stage) }
 set :rollbar_role, -> { :app }
-set :rollbar_user, -> { ENV.fetch("GITHUB_ACTOR", fetch(:local_user, ENV["USER"])) }
+set :rollbar_user, -> { ENV.fetch("GITHUB_ACTOR", fetch(:local_user, ENV.fetch("USER", nil))) }
 
 set :ssh_options, forward_agent: true
 set :log_level, :info
