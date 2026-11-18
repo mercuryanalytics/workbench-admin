@@ -7,6 +7,13 @@ set :repo_url, "git@github.com:mercuryanalytics/workbench-admin.git"
 
 set :branch, "main"
 
+# The central deploy workflow exports ROLLBAR_TOKEN; without it (by-hand deploys) the Rollbar
+# deploy notice fails and is logged, and the deploy carries on.
+set :rollbar_token, ENV.fetch("ROLLBAR_TOKEN", nil)
+set :rollbar_env, -> { fetch(:stage) }
+set :rollbar_role, -> { :app }
+set :rollbar_user, -> { ENV.fetch("GITHUB_ACTOR", fetch(:local_user, ENV["USER"])) }
+
 set :ssh_options, forward_agent: true
 set :log_level, :info
 
