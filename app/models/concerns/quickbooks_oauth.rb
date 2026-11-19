@@ -54,23 +54,19 @@ module QuickbooksOauth
 
     # Production credentials hold the live app; every other environment's hold the sandbox app and set intuit_app.
     def intuit_app
-      Rails.application.credentials.intuit_app&.to_sym || :live
-    end
-
-    def oauth_credentials
-      Rails.application.credentials.intuit
+      ApplicationSecrets.intuit_app&.to_sym || :live
     end
 
     def realm
-      oauth_credentials.realm_id
+      ApplicationSecrets.intuit_realm_id
     end
 
     def oauth_client_id
-      oauth_credentials.client_id
+      ApplicationSecrets.intuit_client_id
     end
 
     def oauth_client_secret
-      oauth_credentials.client_secret
+      ApplicationSecrets.intuit_client_secret
     end
 
     def oauth_options

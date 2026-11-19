@@ -5,4 +5,4 @@ Rails.application.config.intuit_realm = if Rails.env.production?
                                         else
                                           "4620816365181655620"
                                         end
-Quickbooks.sandbox_mode = Rails.application.credentials.intuit_app.to_s == "sandbox"
+Quickbooks.sandbox_mode = ApplicationSecrets.intuit_app.to_s == "sandbox"
