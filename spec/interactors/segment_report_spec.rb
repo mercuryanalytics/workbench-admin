@@ -83,20 +83,70 @@ RSpec.describe SegmentReport do
     end
   end
 
+  describe "user rows" do
+    subject(:user_rows) { described_class.call(period:).user_rows }
+
+    before do
+      client = create(:petasos_client, name: "Acme")
+      join(client, email: "bob@example.com", last_login: 3.weeks.ago)
+      join(client, email: "ann@example.com", last_login: 1.day.ago)
+      join(client, email: "new@example.com")
+      complete("ann@example.com")
+      complete("ann@example.com", model: "AskMercuryAITopline")
+    end
+
+    it "has a row per member under the account, by email" do
+      expect(user_rows.map(&:user)).to eq %w[ann@example.com bob@example.com new@example.com]
+    end
+
+    it "gives each member their own counts and segment" do
+      expect(user_rows.map { |row| row.to_h.slice(:logins, :mercury_ai_reports, :ask_reports, :segment).values })
+        .to eq [[1, 1, 1, :power], [0, 0, 0, :dormant], [0, 0, 0, :dormant]]
+    end
+
+    it "shows the last login as a date, or nothing for a user who never logged in" do
+      expect(user_rows.map(&:last_login)).to eq [1.day.ago.to_date, 3.weeks.ago.to_date, nil]
+    end
+
+    it "adds up to the account row" do
+      account = described_class.call(period:).rows.first
+      expect(user_rows.sum(&:logins)).to eq account.logins
+    end
+  end
+
   describe ".csv" do
-    it "has a header and a line per account" do
-      create(:petasos_client, name: "Acme")
-      lines = described_class.csv(described_class.call(period:).rows).lines
-      expect(lines.map(&:chomp)).to eq ["client_id,account,users,logins,mercury_ai_reports,ask_reports,last_project," \
-                                        "segment,previous_segment,segment_change",
-                                        "#{Petasos::Client.first.id},Acme,0,0,0,0,,dormant,,"]
+    let(:result) { described_class.call(period:) }
+    let(:lines) { described_class.csv(result.rows, result.user_rows).lines.map(&:chomp) }
+    let(:client) { create(:petasos_client, name: "Acme") }
+
+    it "has a header" do
+      expect(lines.first).to eq "level,client_id,account,user,users,last_login,logins,mercury_ai_reports,ask_reports," \
+                                "last_project,segment,previous_segment,segment_change"
+    end
+
+    it "puts an account line, then its users underneath" do
+      join(client, email: "ann@example.com", last_login: Date.new(2026, 10, 20))
+      expect(lines.drop(1)).to eq ["account,#{client.id},Acme,,1,,0,0,0,,dormant,,",
+                                   "user,#{client.id},Acme,ann@example.com,,2026-10-20,0,0,0,,dormant,,"]
+    end
+
+    it "has just an account line for an account without users" do
+      client
+      expect(lines.size).to eq 2
     end
   end
 
   describe ".csv with a name a spreadsheet would run as a formula" do
     it "writes it as text" do
       create(:petasos_client, name: "=HYPERLINK(\"http://example.com\")")
-      expect(described_class.csv(described_class.call(period:).rows)).to include(",\"'=HYPERLINK(")
+      result = described_class.call(period:)
+      expect(described_class.csv(result.rows, result.user_rows)).to include(",\"'=HYPERLINK(")
+    end
+
+    it "writes a user's email as text" do
+      join(create(:petasos_client), email: "+1@example.com")
+      result = described_class.call(period:)
+      expect(described_class.csv(result.rows, result.user_rows)).to include(",'+1@example.com,")
     end
   end
 

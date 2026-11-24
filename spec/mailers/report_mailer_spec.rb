@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe ReportMailer do
   describe "#weekly" do
-    subject(:mail) { described_class.weekly(rows:, period: Date.new(2026, 10, 19).in_time_zone.all_week) }
+    subject(:mail) { described_class.weekly(rows:, user_rows:, period: Date.new(2026, 10, 19).in_time_zone.all_week) }
 
     let(:rows) do
       [
@@ -13,6 +13,8 @@ RSpec.describe ReportMailer do
         build(:segment_row, segment: :dormant, segment_change: nil)
       ]
     end
+
+    let(:user_rows) { [build(:segment_user_row, account: rows.first.account, client_id: rows.first.client_id)] }
 
     before do
       allow(ApplicationConfig).to receive(:report_recipients).and_return(["scottb@example.com"])
@@ -25,7 +27,7 @@ RSpec.describe ReportMailer do
     end
 
     it "attaches the CSV" do
-      expect(mail.attachments["segments-2026-10-19.csv"].body.to_s).to eq SegmentReport.csv(rows)
+      expect(mail.attachments["segments-2026-10-19.csv"].body.to_s).to eq SegmentReport.csv(rows, user_rows)
     end
 
     it "summarizes the segments and moves" do

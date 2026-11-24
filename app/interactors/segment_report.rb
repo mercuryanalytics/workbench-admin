@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-# One row per petasos client, built from its members' activity in the period. Users are matched to thoth by email.
+# One row per petasos client, and under it one row per member, built from the members' activity in the period. Users are
+# matched to thoth by email. An account's counts are the sums of its members', and its segment is its most engaged
+# member's.
 class SegmentReport
   include Interactor
 
@@ -10,13 +12,30 @@ class SegmentReport
   Row = Data.define(:client_id, :account, :users, :logins, :mercury_ai_reports, :ask_reports, :last_project, :segment,
                     :previous_segment, :segment_change)
 
+  # A member's week. `logins` is 0 or 1 because petasos keeps only the latest login; `last_login` is that date, which
+  # also shows whether the user has ever logged in.
+  UserRow = Data.define(:client_id, :account, :user, :last_login, :logins, :mercury_ai_reports, :ask_reports, :segment)
+
+  COLUMNS = %i[level client_id account user users last_login logins mercury_ai_reports ask_reports last_project segment
+               previous_segment segment_change].freeze
+
   FORMULA_START = /\A[=+\-@\t\r]/
 
-  def self.csv(rows)
+  # Each account row is followed by its members' rows.
+  def self.csv(rows, user_rows)
+    users = user_rows.group_by(&:client_id)
     CSV.generate do |csv|
-      csv << Row.members
-      rows.each { |row| csv << row.to_h.values.map { |value| spreadsheet_safe(value) } }
+      csv << COLUMNS
+      rows.each do |row|
+        csv << line(:account, row)
+        users.fetch(row.client_id, []).each { |user| csv << line(:user, user) }
+      end
     end
+  end
+
+  def self.line(level, row)
+    attributes = row.to_h.merge(level:)
+    COLUMNS.map { |column| spreadsheet_safe(attributes[column]) }
   end
 
   # Account names and project numbers are free text, and a spreadsheet runs a cell starting with one of these as a
@@ -29,21 +48,31 @@ class SegmentReport
   delegate :period, to: :context
 
   def call
-    context.rows = Petasos::Client.order(:name).pluck(:id, :name).map { |id, name| row(id, name) }
+    clients = Petasos::Client.order(:name).pluck(:id, :name)
+    users = clients.to_h { |id, name| [id, user_rows(id, name)] }
+    context.rows = clients.map { |id, name| row(id, name, users.fetch(id)) }
+    context.user_rows = users.values.flatten
   end
 
   private
 
-  def row(id, name)
-    members = members_by_client.fetch(id, [])
-    logins = members.count { |_, _, last_login| period.cover?(last_login) }
-    ask = members.sum { |_, email, _| ask_counts.fetch(email, 0) }
-    reports = members.sum { |_, email, _| report_counts.fetch(email, 0) } - ask
+  def user_rows(id, name)
+    members_by_client.fetch(id, []).sort_by { |_, email, _| email }.map do |_, email, last_login|
+      ask = ask_counts.fetch(email, 0)
+      reports = report_counts.fetch(email, 0) - ask
+      logins = period.cover?(last_login) ? 1 : 0
 
+      UserRow.new(client_id: id, account: name, user: email, last_login: last_login&.in_time_zone&.to_date, logins:,
+                  mercury_ai_reports: reports, ask_reports: ask, segment: segment(logins:, reports:, ask:))
+    end
+  end
+
+  def row(id, name, users)
+    logins, reports, ask = %i[logins mercury_ai_reports ask_reports].map { |count| users.sum(&count) }
     segment = segment(logins:, reports:, ask:)
     previous = previous_segments[id]
 
-    Row.new(client_id: id, account: name, users: members.size, logins:, mercury_ai_reports: reports, ask_reports: ask,
+    Row.new(client_id: id, account: name, users: users.size, logins:, mercury_ai_reports: reports, ask_reports: ask,
             last_project: last_projects[id], segment:, previous_segment: previous,
             segment_change: change(previous, segment))
   end
