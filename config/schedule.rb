@@ -7,3 +7,8 @@ set :job_template, "bash -l -c ':job'"
 every :wednesday, at: "6am" do
   rake "quickbooks:keep_alive"
 end
+
+# Early Monday ET, so the week that just ended (Monday to Sunday) is complete.
+every :monday, at: "6am" do
+  rake "report:weekly"
+end

@@ -54,21 +54,22 @@ Rails.application.configure do
   # Replace the default in-process and non-durable queuing backend for Active Job.
   # config.active_job.queue_adapter = :resque
 
-  # Ignore bad email addresses and do not raise email delivery errors.
-  # Set this to true and configure the email server for immediate delivery to raise delivery errors.
-  # config.action_mailer.raise_delivery_errors = false
+  # The weekly report is mailed from cron, so a failed delivery has to be loud.
+  config.action_mailer.raise_delivery_errors = true
 
   # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: "example.com" }
 
-  # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
-  # config.action_mailer.smtp_settings = {
-  #   user_name: Rails.application.credentials.dig(:smtp, :user_name),
-  #   password: Rails.application.credentials.dig(:smtp, :password),
-  #   address: "smtp.example.com",
-  #   port: 587,
-  #   authentication: :plain
-  # }
+  # The same SES `smtp` credentials block petasos uses. STARTTLS is required rather than read from the credentials, so
+  # a missing `tls` key can't send the password in the clear.
+  config.action_mailer.smtp_settings = {
+    address: ApplicationSecrets.smtp_host,
+    port: ApplicationSecrets.smtp_port,
+    user_name: ApplicationSecrets.smtp_username,
+    password: ApplicationSecrets.smtp_password,
+    authentication: :login,
+    enable_starttls: true
+  }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

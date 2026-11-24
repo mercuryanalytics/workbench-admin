@@ -4,6 +4,10 @@ require_relative "boot"
 
 require "rails/all"
 
+# Available to early-boot ERB in config/database.yml, before autoloading is set up.
+require_relative "../lib/application_config"
+require_relative "../lib/application_secrets"
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
